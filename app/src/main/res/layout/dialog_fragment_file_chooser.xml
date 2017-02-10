@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/file_chooser_title_height"
+        android:background="@android:color/white"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        >
+
+        <ImageView
+            android:id="@+id/iv_close_chooser"
+            android:layout_width="@dimen/file_chooser_title_height"
+            android:layout_height="@dimen/file_chooser_title_height"
+            android:background="@drawable/selector_background"
+            android:padding="@dimen/file_chooser_padding"
+            android:src="@drawable/ic_close_chooser"
+            />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/file_chooser_margin_horizontal"
+            android:layout_marginLeft="@dimen/file_chooser_margin_horizontal"
+            android:layout_marginRight="@dimen/file_chooser_margin_horizontal"
+            android:layout_marginStart="@dimen/file_chooser_margin_horizontal"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
+            tools:text="File Chooser"
+            />
+
+        <TextView
+            android:id="@+id/tv_confirm"
+            android:layout_width="@dimen/file_chooser_title_height"
+            android:layout_height="@dimen/file_chooser_title_height"
+            android:background="@drawable/selector_background"
+            android:gravity="center"
+            tools:text="save"
+            />
+
+    </LinearLayout>
+
+    <include layout="@layout/view_divider"/>
+
+    <LinearLayout
+        android:id="@+id/ll_path_container"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/file_chooser_title_height"
+        android:background="@drawable/selector_background"
+        android:orientation="horizontal"
+        >
+
+        <ImageView
+            android:id="@+id/iv_pre_directory"
+            android:layout_width="@dimen/file_chooser_title_height"
+            android:layout_height="@dimen/file_chooser_title_height"
+            android:padding="@dimen/file_chooser_padding"
+            android:src="@drawable/ic_pre_directory"
+            />
+
+        <TextView
+            android:id="@+id/tv_current_directory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="@dimen/file_chooser_margin_horizontal"
+            android:layout_marginLeft="@dimen/file_chooser_margin_horizontal"
+            android:layout_marginRight="@dimen/file_chooser_margin_horizontal"
+            android:layout_marginStart="@dimen/file_chooser_margin_horizontal"
+            android:ellipsize="start"
+            android:gravity="center_vertical"
+            android:maxLines="1"
+            />
+
+    </LinearLayout>
+
+    <include layout="@layout/view_divider"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
+
+</LinearLayout>

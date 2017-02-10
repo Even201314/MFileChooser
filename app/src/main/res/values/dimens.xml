@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="file_chooser_title_height">48dp</dimen>
+    <dimen name="file_chooser_padding">12dp</dimen>
+    <dimen name="file_chooser_margin_horizontal">16dp</dimen>
+</resources>
