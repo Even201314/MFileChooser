@@ -1,15 +1,22 @@
 package com.even.mfilechooser;
 
+import android.Manifest;
+import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,6 +24,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 import com.even.mfilechooser.adapter.ItemAdapter;
 import com.even.mfilechooser.interfaces.OnChooserSelectedListener;
 import com.even.mfilechooser.interfaces.OnFileSelectedListener;
@@ -35,8 +43,13 @@ import java.util.List;
  */
 
 public class FileChooser extends DialogFragment {
+    private static final int PERMISSION_READ_EXTERNAL_STORAGE = 0;
+
     public static final int MODE_FILE = 0;
     public static final int MODE_DIRECTORY = 1;
+
+    private Context mContext;
+    private String tipsForReadPermission;
 
     private List<String> fileFormats;
 
@@ -137,7 +150,14 @@ public class FileChooser extends DialogFragment {
 
     private void getFileList(String path) {
         currentDirectoryPath = path;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            checkReadPermission((Activity) mContext, path);
+        } else {
+            refreshFileList(path);
+        }
+    }
 
+    private void refreshFileList(String path) {
         tvCurrentDirectory.setText(path);
 
         File[] files = new File(path).listFiles(new FileFilter() {
@@ -175,6 +195,43 @@ public class FileChooser extends DialogFragment {
         }
     }
 
+    @TargetApi(Build.VERSION_CODES.M)
+    private void checkReadPermission(Activity activity, String path) {
+        int permissionRead =
+            ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE);
+        if (permissionRead != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(activity,
+                Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                showTipsForReadPermission();
+            } else {
+                this.requestPermissions(new String[] { Manifest.permission.READ_EXTERNAL_STORAGE },
+                    PERMISSION_READ_EXTERNAL_STORAGE);
+            }
+        } else {
+            refreshFileList(path);
+        }
+    }
+
+    @Override public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+        @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSION_READ_EXTERNAL_STORAGE:
+                if (grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    refreshFileList(currentDirectoryPath);
+                } else {
+                    showTipsForReadPermission();
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void showTipsForReadPermission() {
+        Toast.makeText(mContext, tipsForReadPermission, Toast.LENGTH_SHORT).show();
+    }
+
     private boolean isFileMatchFormat(File file) {
         if (fileFormats != null && fileFormats.size() > 0) {
             for (String fileFormat : fileFormats) {
@@ -187,7 +244,7 @@ public class FileChooser extends DialogFragment {
         return file.isFile();
     }
 
-    public static class Builder {
+    @SuppressWarnings("unused") public static class Builder {
         private Context mContext;
         private int style;
         private int theme;
@@ -196,12 +253,13 @@ public class FileChooser extends DialogFragment {
         private int directoryIconId;
         private String confirmText;
         private List<String> fileFormats;
+        private String tipsForReadPermission;
         private OnChooserSelectedListener onChooserSelectedListener;
         private @ColorInt int confirmTextColor;
         private @ChooserMode int chooserMode = MODE_FILE;
 
-        public Builder(Context Context) {
-            this.mContext = Context;
+        public Builder(Context context) {
+            this.mContext = context;
         }
 
         public Builder setStyle(int style) {
@@ -255,9 +313,15 @@ public class FileChooser extends DialogFragment {
             return this;
         }
 
+        public Builder setTipsForReadPermission(String tipsForReadPermission) {
+            this.tipsForReadPermission = tipsForReadPermission;
+            return this;
+        }
+
         public FileChooser build() {
             FileChooser fileChooser = new FileChooser();
 
+            fileChooser.mContext = this.mContext;
             fileChooser.setStyle(getStyle(), getTheme());
             fileChooser.initialDirectoryPath = this.initialDirectoryPath;
             fileChooser.fileIconId = getFileIconId();
@@ -267,6 +331,7 @@ public class FileChooser extends DialogFragment {
             fileChooser.confirmTextColor = getConfirmTextColor();
             fileChooser.onChooserSelectedListener = this.onChooserSelectedListener;
             fileChooser.fileFormats = this.fileFormats;
+            fileChooser.tipsForReadPermission = getTipsForReadPermission();
 
             return fileChooser;
         }
@@ -290,6 +355,11 @@ public class FileChooser extends DialogFragment {
         private String getConfirmText() {
             return (confirmText == null || confirmText.isEmpty()) ? mContext.getString(
                 R.string.chooser_save) : confirmText;
+        }
+
+        private String getTipsForReadPermission() {
+            return (tipsForReadPermission == null || tipsForReadPermission.isEmpty())
+                ? mContext.getString(R.string.chooser_tips_read_permission) : tipsForReadPermission;
         }
 
         private @ColorInt int getConfirmTextColor() {

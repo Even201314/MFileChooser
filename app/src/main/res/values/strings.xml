@@ -1,3 +1,4 @@
 <resources>
     <string name="chooser_save">Save</string>
+    <string name="chooser_tips_read_permission">You are not authorized to access photos, media and files on your device</string>
 </resources>

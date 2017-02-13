@@ -23,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
     private void showFileChooser() {
         FileChooser.Builder builder =
             new FileChooser.Builder(this).setChooserMode(FileChooser.MODE_FILE)
+                .setTipsForReadPermission("你没有授权访问设备上的照片、媒体内容和文件")
                 .setOnChooserSelectedListener(new OnChooserSelectedListener() {
                     @Override public void onSelect(String path) {
                         Log.d(MainActivity.class.getSimpleName(), path);
